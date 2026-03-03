@@ -1,0 +1,72 @@
+C51 COMPILER V9.60.7.0   ULTRASONIC                                                        12/30/2025 16:01:50 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE ULTRASONIC
+OBJECT MODULE PLACED IN .\Objects\Ultrasonic.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE hardware\Ultrasonic.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\hardwar
+                    -e;.\user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\Ultrasonic.lst) TABS(2) OBJECT(.\Objects\Ultrasonic.obj)
+
+line level    source
+
+   1          #include "Ultrasonic.h"
+   2          
+   3          void gpio_ultrasonic_init(){
+   4   1        //echo:transment the information of starting. trig:the control mode.
+   5   1        GPIO_InitTypeDef echo_gpio,trig_gpio;
+   6   1        
+   7   1        echo_gpio.Mode=GPIO_PullUp;
+   8   1        echo_gpio.Pin=GPIO_Pin_3;
+   9   1        trig_gpio.Mode=GPIO_PullUp;
+  10   1        trig_gpio.Pin=GPIO_Pin_7;
+  11   1        
+  12   1        GPIO_Inilize(GPIO_P3,&echo_gpio);
+  13   1        GPIO_Inilize(GPIO_P4,&trig_gpio);
+  14   1      }
+  15          
+  16          void Delay10us(void)  //@24.000MHz
+  17          {
+  18   1        unsigned char data i;
+  19   1      
+  20   1        i = 78;
+  21   1        while (--i);
+  22   1      }
+  23          
+  24          
+  25          float ultrasonic_get(){
+  26   1        u8 i=20;
+  27   1        u8 cnt=0;
+  28   1        float curr_dis=0;
+  29   1        P47=1;
+  30   1        Delay10us();
+  31   1        P47=0;
+  32   1      //  do{
+  33   1      //    Delay10us();
+  34   1      //  }while(--i);
+  35   1        os_wait2(K_TMO,4);
+  36   1        while(P33==1){
+  37   2          
+  38   2          Delay10us();
+  39   2          cnt++;
+  40   2        }
+  41   1        curr_dis=cnt*34/100/2;
+  42   1        
+  43   1        printf("dis:%f\n",curr_dis);
+  44   1        return curr_dis;
+  45   1      
+  46   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    166    ----
+   CONSTANT SIZE    =      8    ----
+   XDATA SIZE       =   ----      10
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+C51 COMPILER V9.60.7.0   ULTRASONIC                                                        12/30/2025 16:01:50 PAGE 2   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

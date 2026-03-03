@@ -1,0 +1,1 @@
+"lib\UART.c" LARGE OPTIMIZE (8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\UART.lst) TABS (2) OBJECT(.\Objects\UART.obj)

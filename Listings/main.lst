@@ -1,0 +1,66 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              12/30/2025 16:01:48 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE user\main.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\user;.
+                    -\os) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include "config.h"
+   2          
+   3          
+   4          void system_init(){
+   5   1        EAXSFR();
+   6   1        led_init();
+   7   1        key_init();
+   8   1        user_uart_all_init();
+   9   1        bluetooth_init();
+  10   1        EA=1;
+  11   1        bat_all_init();
+  12   1        track_gpio_init();
+  13   1        gpio_ultrasonic_init();
+  14   1        motor_all_init();
+  15   1        //motor_set(0,0,0,0);
+  16   1        buzzer_init();
+  17   1        buzzer_pwm_init();
+  18   1      }
+  19          
+  20          void main_start() _task_ 0{
+  21   1        system_init();
+  22   1        os_create_task(key_task_num);
+  23   1        os_create_task(user_uart_task_num);
+  24   1        os_create_task(bluetooth_task_num);
+  25   1        os_create_task(bat_task_num);
+  26   1        
+  27   1        
+  28   1        os_delete_task(0);
+  29   1      }
+  30          
+  31          void key_down(){
+  32   1        printf("key_down");
+  33   1        led_on();
+  34   1        Motors_move(0 ,50);
+  35   1      }
+  36          
+  37          void key_up(){
+  38   1        printf("key_up");
+  39   1        led_off();
+  40   1        Motors_move(0,0);
+  41   1        os_send_signal(1);
+  42   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    134    ----
+   CONSTANT SIZE    =     16    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

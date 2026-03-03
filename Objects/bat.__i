@@ -1,0 +1,1 @@
+"hardware\bat.c" LARGE OPTIMIZE (8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\bat.lst) TABS (2) OBJECT(.\Objects\bat.obj)

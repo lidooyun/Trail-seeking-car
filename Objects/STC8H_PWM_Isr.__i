@@ -1,0 +1,1 @@
+"lib\STC8H_PWM_Isr.c" LARGE OPTIMIZE (8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\STC8H_PWM_Isr.lst) TABS (2) OBJECT(.\Objects\STC8H_PWM_Isr.obj)

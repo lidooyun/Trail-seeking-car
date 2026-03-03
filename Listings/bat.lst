@@ -1,0 +1,57 @@
+C51 COMPILER V9.60.7.0   BAT                                                               12/30/2025 16:01:50 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE BAT
+OBJECT MODULE PLACED IN .\Objects\bat.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE hardware\bat.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\use
+                    -r;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\bat.lst) TABS(2) OBJECT(.\Objects\bat.obj)
+
+line level    source
+
+   1          #include "bat.h"
+   2          float V_NUM;
+   3          
+   4          void bat_gpio_init(){
+   5   1          GPIO_InitTypeDef bat_gpio;
+   6   1          bat_gpio.Mode = GPIO_HighZ;
+   7   1          bat_gpio.Pin = GPIO_Pin_3;
+   8   1          
+   9   1          GPIO_Inilize(GPIO_P1, &bat_gpio);
+  10   1      }
+  11          
+  12          void bat_adc_init(){
+  13   1          ADC_InitTypeDef bat_adc;
+  14   1        
+  15   1          bat_adc.ADC_SMPduty = 31;   //ADC 模拟信号采样时间控制, 0~31（注意： SMPDUTY 一定不能设置小于 10）
+  16   1          bat_adc.ADC_Speed = ADC_SPEED_2X1T;     //设置 ADC 工作时钟频率 ADC_SPEED_2X1T~ADC_SPEED_2X16T
+  17   1          bat_adc.ADC_AdjResult = ADC_RIGHT_JUSTIFIED;  //ADC结果调整,  ADC_LEFT_JUSTIFIED,ADC_RIGHT_JUSTIFIED
+  18   1          bat_adc.ADC_CsSetup = 0;    //ADC 通道选择时间控制 0(默认),1
+  19   1          bat_adc.ADC_CsHold = 1;     //ADC 通道选择保持时间控制 0,1(默认),2,3
+  20   1          
+  21   1          ADC_Inilize(&bat_adc);
+  22   1        
+  23   1          ADC_PowerControl(ENABLE);
+  24   1      }
+  25          
+  26          void bat_all_init(){
+  27   1        bat_gpio_init();
+  28   1        bat_adc_init();
+  29   1      }
+  30          void get_bat_v(){
+  31   1        V_NUM=Get_ADCResult(3)*5.7*2.5/4096;
+  32   1        
+  33   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     97    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      4       7
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

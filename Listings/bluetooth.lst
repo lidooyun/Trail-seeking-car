@@ -1,0 +1,135 @@
+C51 COMPILER V9.60.7.0   BLUETOOTH                                                         12/30/2025 16:01:50 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE BLUETOOTH
+OBJECT MODULE PLACED IN .\Objects\bluetooth.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE hardware\bluetooth.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\hardware
+                    -;.\user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\bluetooth.lst) TABS(2) OBJECT(.\Objects\bluetooth.obj)
+
+line level    source
+
+   1          #include "bluetooth.h"
+   2          
+   3          
+   4          void bluetooth_gpio_init(){
+   5   1        // tx P30 rx P31
+   6   1        GPIO_InitTypeDef bluetooth_gpio;
+   7   1        bluetooth_gpio.Mode = GPIO_PullUp;
+   8   1        bluetooth_gpio.Pin = GPIO_Pin_0 | GPIO_Pin_1;
+   9   1        
+  10   1        GPIO_Inilize(GPIO_P1, &bluetooth_gpio);
+  11   1      }
+  12          
+  13          void bluetooth_uart_init(){
+  14   1        COMx_InitDefine bluetooth_uart;
+  15   1        
+  16   1        bluetooth_uart.UART_Mode  = UART_8bit_BRTx;     //模式,         UART_ShiftRight,UART_8bit_BRTx,UART_9bit,UA
+             -RT_9bit_BRTx
+  17   1        bluetooth_uart.UART_BRT_Use = BRT_Timer2;   //使用波特率,   BRT_Timer1,BRT_Timer2,BRT_Timer3,BRT_Timer4
+  18   1        bluetooth_uart.UART_BaudRate = 115200;  //9600  //波特率,      一般 110 ~ 115200
+  19   1        //115200 8个电平跳变+1开始位+结束位置 = 10位
+  20   1        //11.25kb/s
+  21   1        bluetooth_uart.Morecommunicate = DISABLE; //多机通讯允许, ENABLE,DISABLE
+  22   1        bluetooth_uart.UART_RxEnable = ENABLE;    //允许接收,   ENABLE,DISABLE
+  23   1        bluetooth_uart.BaudRateDouble = DISABLE;    //波特率加倍, ENABLE,DISABLE
+  24   1      
+  25   1        UART_Configuration(UART2, &bluetooth_uart);
+  26   1        
+  27   1        //中断开关
+  28   1        NVIC_UART2_Init(ENABLE,Priority_1);
+  29   1        
+  30   1        //把引脚从gpio功能切换成uart功能
+  31   1        UART2_SW(UART2_SW_P10_P11);
+  32   1        
+  33   1      }
+  34          
+  35          
+  36          void bluetooth_init(){
+  37   1        bluetooth_gpio_init();
+  38   1        bluetooth_uart_init();
+  39   1      }
+  40          u8 led_state=0;
+  41          u8 buzzer_state=0;
+  42          u8 auto_tracke_task = 0;
+  43          void data_tackle(u8* data_num ,u8 Cnt){
+  44   1        char x,y;
+  45   1        if(Cnt>8)return;
+  46   1        if(data_num[0]==0xDD&&data_num[1]==0x77){
+  47   2          printf("head success\n");
+  48   2          if(data_num[4]==0x01){
+  49   3            led_state=!led_state;
+  50   3            if(led_state){
+  51   4              led_on();
+  52   4            }
+  53   3            else{
+C51 COMPILER V9.60.7.0   BLUETOOTH                                                         12/30/2025 16:01:50 PAGE 2   
+
+  54   4              led_off();
+  55   4            }
+  56   3          }
+  57   2          
+  58   2          if(data_num[5]==0x01){
+  59   3            buzzer_state=!buzzer_state;
+  60   3            if(buzzer_state){
+  61   4              buzzer_start();
+  62   4            }
+  63   3            else{
+  64   4              buzzer_stop();
+  65   4            }
+  66   3          }
+  67   2          if(data_num[6]==0x01){
+  68   3            printf("Button C is pressing");
+  69   3          }
+  70   2          if(data_num[7] == 0x01){
+  71   3            auto_tracke_task = ~auto_tracke_task;
+  72   3            if(auto_tracke_task){
+  73   4              os_create_task(track_task_num);
+  74   4            }
+  75   3            else{
+  76   4              os_delete_task(track_task_num);
+  77   4            }
+  78   3          }
+  79   2          
+  80   2          if(auto_tracke_task){
+  81   3            return;
+  82   3          }
+  83   2          
+  84   2          x=data_num[2];
+  85   2          y=data_num[3];
+  86   2          
+  87   2          Motors_move((float) x,(float) y);
+  88   2        }
+  89   1      }
+  90          
+  91          
+  92          void bluetooth_receive(){
+  93   1        u8 i=0;
+  94   1        if(COM2.RX_TimeOut>0&& --COM2.RX_TimeOut==0){
+  95   2          if(COM2.RX_Cnt>0){
+  96   3            for(;i<COM2.RX_Cnt;i++){
+  97   4              TX1_write2buff(RX2_Buffer[i]);
+  98   4              //printf("test");
+  99   4              //printf("%s\n",RX2_Buffer[i]);
+ 100   4            }
+ 101   3            data_tackle(RX2_Buffer,COM2.RX_Cnt);
+ 102   3          }
+ 103   2          COM2.RX_Cnt=0;
+ 104   2        }
+ 105   1        
+ 106   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    460    ----
+   CONSTANT SIZE    =     35    ----
+   XDATA SIZE       =      3      16
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.7.0   BLUETOOTH                                                         12/30/2025 16:01:50 PAGE 3   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

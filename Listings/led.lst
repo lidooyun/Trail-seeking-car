@@ -1,0 +1,59 @@
+C51 COMPILER V9.60.7.0   LED                                                               12/30/2025 16:01:50 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LED
+OBJECT MODULE PLACED IN .\Objects\led.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE hardware\led.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\use
+                    -r;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\led.lst) TABS(2) OBJECT(.\Objects\led.obj)
+
+line level    source
+
+   1          #include "led.h"
+   2          
+   3          //第一步 初始化
+   4          //模式引脚端口
+   5          //P07 ,P52
+   6          void led_init(){
+   7   1        GPIO_InitTypeDef LEDL_GPIO;
+   8   1        GPIO_InitTypeDef LEDR_GPIO;
+   9   1        
+  10   1        LEDL_GPIO.Mode = GPIO_OUT_PP;
+  11   1        LEDL_GPIO.Pin = GPIO_Pin_7;
+  12   1        
+  13   1        LEDR_GPIO.Mode = GPIO_OUT_PP;
+  14   1        LEDR_GPIO.Pin = GPIO_Pin_2;
+  15   1        
+  16   1        GPIO_Inilize(GPIO_P0, &LEDL_GPIO);
+  17   1        GPIO_Inilize(GPIO_P5, &LEDR_GPIO);
+  18   1      }
+  19          
+  20          void led_on(){
+  21   1          P07 = 1;
+  22   1          P52 = 1;
+  23   1      }
+  24          void led_off(){
+  25   1          P07 = 0;
+  26   1          P52 = 0;
+  27   1      }
+  28          void led_blink(){
+  29   1        led_on();
+  30   1        delay_ms(250);
+  31   1        delay_ms(250);
+  32   1        led_off();
+  33   1        delay_ms(250);
+  34   1        delay_ms(250);
+  35   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     75    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       4
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

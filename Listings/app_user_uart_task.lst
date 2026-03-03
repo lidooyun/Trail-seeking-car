@@ -1,0 +1,42 @@
+C51 COMPILER V9.60.7.0   APP_USER_UART_TASK                                                12/30/2025 16:01:48 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE APP_USER_UART_TASK
+OBJECT MODULE PLACED IN .\Objects\app_user_uart_task.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE user\app_user_uart_task.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\har
+                    -dware;.\user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\app_user_uart_task.lst) TABS(2) OBJECT(.\Objects\app_user_uart_ta
+                    -sk.obj)
+
+line level    source
+
+   1          #include "config.h"
+   2          
+   3          void user_uart_receive(){
+   4   1        printf("%s\n",RX1_Buffer);
+   5   1      }
+   6          
+   7          void user_uart_task() _task_ user_uart_task_num{
+   8   1        while(1){
+   9   2          if(COM1.RX_TimeOut > 0 && --COM1.RX_TimeOut == 0) {
+  10   3            if(COM1.RX_Cnt>0) {
+  11   4              user_uart_receive();
+  12   4            }
+  13   3            COM1.RX_Cnt = 0;
+  14   3          }
+  15   2          os_wait2(K_TMO,1);
+  16   2        }
+  17   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     63    ----
+   CONSTANT SIZE    =      4    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

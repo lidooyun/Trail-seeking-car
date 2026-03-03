@@ -1,0 +1,1 @@
+"lib\NVIC.c" LARGE OPTIMIZE (8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\NVIC.lst) TABS (2) OBJECT(.\Objects\NVIC.obj)

@@ -1,0 +1,242 @@
+C51 COMPILER V9.60.7.0   MOTOR                                                             12/30/2025 16:01:49 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MOTOR
+OBJECT MODULE PLACED IN .\Objects\motor.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE hardware\motor.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\u
+                    -ser;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\motor.lst) TABS(2) OBJECT(.\Objects\motor.obj)
+
+line level    source
+
+   1          #include "motor.h"
+   2          //初始化gpio
+   3          void motor_front_gpio_init(){
+   4   1        GPIO_InitTypeDef motor_front_gpio;
+   5   1        motor_front_gpio.Mode = GPIO_OUT_PP;
+   6   1        motor_front_gpio.Pin = GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
+   7   1        GPIO_Inilize(GPIO_P1,&motor_front_gpio);
+   8   1      }
+   9          //初始化gpio
+  10          void motor_back_gpio_init(){
+  11   1        GPIO_InitTypeDef motor_back_gpio;
+  12   1        motor_back_gpio.Mode = GPIO_OUT_PP;
+  13   1        motor_back_gpio.Pin = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3;
+  14   1        GPIO_Inilize(GPIO_P2,&motor_back_gpio);
+  15   1      }
+  16          
+  17          void motor_pwma_init(u8 state){
+  18   1        PWMx_InitDefine motor_pwma;
+  19   1        motor_pwma.PWM_Period = MAIN_Fosc/1000;   //周期时间,   0~65535
+  20   1        motor_pwma.PWM_DeadTime = 0;  //死区发生器设置, 0~255
+  21   1        if(state == ENABLE){
+  22   2          motor_pwma.PWM_CEN_Enable = ENABLE;   //使能计数器, ENABLE,DISABLE
+  23   2          motor_pwma.PWM_MainOutEnable = ENABLE;//主输出使能,  ENABLE,DISABLE
+  24   2        }else if(state == DISABLE){
+  25   2          motor_pwma.PWM_CEN_Enable = DISABLE;    //使能计数器, ENABLE,DISABLE
+  26   2          motor_pwma.PWM_MainOutEnable = DISABLE;//主输出使能,  ENABLE,DISABLE
+  27   2      
+  28   2        }
+  29   1          PWM_Configuration(PWMA, &motor_pwma);
+  30   1      }
+  31          
+  32          //初始化pwm 左前轮
+  33          //speed = -100 - 0 - 100
+  34          void motor_fl_pwm_init(float speed){
+  35   1        PWMx_InitDefine motor_fl_pwm;
+  36   1        u8 forward = 1;
+  37   1        
+  38   1        if(speed  >= 100){
+  39   2          speed = 100;
+  40   2        }
+  41   1        if(speed<=-100){
+  42   2          speed = -100;
+  43   2        }
+  44   1        forward =  (speed>=0);
+  45   1        if(forward){
+  46   2          motor_fl_pwm.PWM_EnoSelect = ENO3N;   //输出通道选择, ENO1P,ENO1N,ENO2P,ENO2N,ENO3P,ENO3N,ENO4P,ENO4N / E
+             -NO5P,ENO6P,ENO7P,ENO8P
+  47   2        }else{
+  48   2          motor_fl_pwm.PWM_EnoSelect = ENO3P;
+  49   2        }
+  50   1        speed = (speed>=0 ? speed : -speed);
+  51   1        motor_fl_pwm.PWM_Mode = CCMRn_PWM_MODE2;
+  52   1        motor_fl_pwm.PWM_Duty = (MAIN_Fosc/1000) * (speed/100);     //占空比时间, 0~Period
+  53   1        printf("speed = %f\n",speed);
+C51 COMPILER V9.60.7.0   MOTOR                                                             12/30/2025 16:01:49 PAGE 2   
+
+  54   1        printf("motor_fl_pwm.PWM_Duty  = %d\n",motor_fl_pwm.PWM_Duty );
+  55   1        PWM_Configuration(PWM3, &motor_fl_pwm);
+  56   1        PWM3_SW(PWM3_SW_P14_P15);
+  57   1      }
+  58          
+  59          //初始化pwm 右前轮
+  60          //speed = -100 - 0 - 100
+  61          void motor_fr_pwm_init(float speed){
+  62   1        PWMx_InitDefine motor_fr_pwm;
+  63   1        u8 forward = 1;
+  64   1        
+  65   1        if(speed  >= 100){
+  66   2          speed = 100;
+  67   2        }
+  68   1        if(speed<=-100){
+  69   2          speed = -100;
+  70   2        }
+  71   1        forward =  (speed>=0);
+  72   1        if(forward){
+  73   2          motor_fr_pwm.PWM_EnoSelect = ENO4P;   //输出通道选择, ENO1P,ENO1N,ENO2P,ENO2N,ENO3P,ENO3N,ENO4P,ENO4N / E
+             -NO5P,ENO6P,ENO7P,ENO8P
+  74   2        }else{
+  75   2          motor_fr_pwm.PWM_EnoSelect = ENO4N;
+  76   2        }
+  77   1        speed = (speed>=0 ? speed : -speed);
+  78   1        motor_fr_pwm.PWM_Mode = CCMRn_PWM_MODE2;
+  79   1        motor_fr_pwm.PWM_Duty = MAIN_Fosc/1000 * speed/100;     //占空比时间, 0~Period
+  80   1        PWM_Configuration(PWM4, &motor_fr_pwm);
+  81   1        PWM4_SW(PWM4_SW_P16_P17);
+  82   1        
+  83   1      }
+  84          
+  85          //初始化pwm 左后轮
+  86          //speed = -100 - 0 - 100
+  87          void motor_bl_pwm_init(float speed){
+  88   1        PWMx_InitDefine motor_bl_pwm;
+  89   1        u8 forward = 1;
+  90   1        
+  91   1        if(speed  >= 100){
+  92   2          speed = 100;
+  93   2        }
+  94   1        if(speed<=-100){
+  95   2          speed = -100;
+  96   2        }
+  97   1        forward =  (speed>=0);
+  98   1        if(forward){
+  99   2          motor_bl_pwm.PWM_EnoSelect = ENO1N;   //输出通道选择, ENO1P,ENO1N,ENO2P,ENO2N,ENO3P,ENO3N,ENO4P,ENO4N / E
+             -NO5P,ENO6P,ENO7P,ENO8P
+ 100   2        }else{
+ 101   2          motor_bl_pwm.PWM_EnoSelect = ENO1P;
+ 102   2        }
+ 103   1        speed = (speed>=0 ? speed : -speed);
+ 104   1        motor_bl_pwm.PWM_Mode = CCMRn_PWM_MODE2;
+ 105   1        motor_bl_pwm.PWM_Duty = MAIN_Fosc/1000 * speed/100;     //占空比时间, 0~Period
+ 106   1        PWM_Configuration(PWM1, &motor_bl_pwm);
+ 107   1        PWM1_SW(PWM1_SW_P20_P21);
+ 108   1      }
+ 109          
+ 110          //初始化pwm 右后轮
+ 111          //speed = -100 - 0 - 100
+ 112          void motor_br_pwm_init(float speed){
+ 113   1        PWMx_InitDefine motor_br_pwm;
+C51 COMPILER V9.60.7.0   MOTOR                                                             12/30/2025 16:01:49 PAGE 3   
+
+ 114   1        u8 forward = 1;
+ 115   1        
+ 116   1        if(speed  >= 100){
+ 117   2          speed = 100;
+ 118   2        }
+ 119   1        if(speed<=-100){
+ 120   2          speed = -100;
+ 121   2        }
+ 122   1        forward =  (speed>=0);
+ 123   1        if(forward){
+ 124   2          motor_br_pwm.PWM_EnoSelect = ENO2P;   //输出通道选择, ENO1P,ENO1N,ENO2P,ENO2N,ENO3P,ENO3N,ENO4P,ENO4N / E
+             -NO5P,ENO6P,ENO7P,ENO8P
+ 125   2        }else{
+ 126   2          motor_br_pwm.PWM_EnoSelect = ENO2N;
+ 127   2        }
+ 128   1        speed = (speed>=0 ? speed : -speed);
+ 129   1        motor_br_pwm.PWM_Mode = CCMRn_PWM_MODE2;
+ 130   1        motor_br_pwm.PWM_Duty = MAIN_Fosc/1000 * speed/100;     //占空比时间, 0~Period
+ 131   1        PWM_Configuration(PWM2, &motor_br_pwm);
+ 132   1        PWM2_SW(PWM2_SW_P22_P23);
+ 133   1      }
+ 134          
+ 135          void motor_set(float fl_speed ,float fr_speed ,float bl_speed ,float br_speed){
+ 136   1        
+ 137   1        motor_fl_pwm_init(fl_speed);
+ 138   1        motor_fr_pwm_init(fr_speed);
+ 139   1        motor_bl_pwm_init(bl_speed);
+ 140   1        motor_br_pwm_init(br_speed);
+ 141   1      }
+ 142          
+ 143          void motor_run(float left_speed ,float right_speed){
+ 144   1        motor_set(left_speed ,right_speed,left_speed ,right_speed);
+ 145   1      }
+ 146          
+ 147          void motor_turn_left(float speed){
+ 148   1      
+ 149   1          motor_run(speed-10 ,speed+10);
+ 150   1      }
+ 151          
+ 152          void motor_turn_right(float speed){
+ 153   1      
+ 154   1          motor_run(speed+10 ,speed-10);
+ 155   1      }
+ 156          
+ 157          void motor_round(float speed){
+ 158   1      
+ 159   1          motor_run(-speed ,speed);
+ 160   1      }
+ 161          
+ 162          void motor_stop(){
+ 163   1      
+ 164   1        motor_run(0 ,0);
+ 165   1      }
+ 166          
+ 167          void motor_all_init(){
+ 168   1        //gpio
+ 169   1        motor_front_gpio_init();
+ 170   1        motor_back_gpio_init();
+ 171   1        //pwm
+ 172   1        motor_pwma_init(ENABLE);
+ 173   1        //所有轮子设置0
+ 174   1        //motor_run(0,0);
+C51 COMPILER V9.60.7.0   MOTOR                                                             12/30/2025 16:01:49 PAGE 4   
+
+ 175   1      }
+ 176          
+ 177          static float clip_speed(float speed) {
+ 178   1      
+ 179   1          if(speed < -100) {
+ 180   2              return -100;
+ 181   2          } else if(speed > 100) {
+ 182   2              return 100;
+ 183   2          }
+ 184   1          return speed;
+ 185   1      }
+ 186          
+ 187          /**
+ 188          ┏    ↑Y+  ┓
+ 189          
+ 190              x
+ 191          ←    0     →
+ 192          X-          X+
+ 193              x
+ 194          ┗    ↓Y-  ┛
+ 195          
+ 196          X    -100     0     100
+ 197          Y    -100     0     100
+ 198          
+ 199          Y 100
+ 200          X -50
+ 201          **/
+ 202          void Motors_move(float x, float y) {
+ 203   1          // 把数值限制在 -60 -> 60
+ 204   1          motor_fl_pwm_init(0.6 * clip_speed(y + x));
+ 205   1          motor_bl_pwm_init(0.6 * clip_speed(y - x));
+ 206   1          motor_fr_pwm_init(0.6 * clip_speed(y - x));
+ 207   1          motor_br_pwm_init(0.6 * clip_speed(y + x));   
+ 208   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1858    ----
+   CONSTANT SIZE    =     41    ----
+   XDATA SIZE       =   ----     117
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

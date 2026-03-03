@@ -1,0 +1,72 @@
+C51 COMPILER V9.60.7.0   BUZZER                                                            12/30/2025 16:01:50 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE BUZZER
+OBJECT MODULE PLACED IN .\Objects\buzzer.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE hardware\buzzer.c LARGE OPTIMIZE(8,SPEED) BROWSE INCDIR(.\lib;.\hardware;.\
+                    -user;.\os) DEBUG OBJECTEXTEND PRINT(.\Listings\buzzer.lst) TABS(2) OBJECT(.\Objects\buzzer.obj)
+
+line level    source
+
+   1          #include "buzzer.h"
+   2          //激活gpio
+   3          void buzzer_init(){
+   4   1        GPIO_InitTypeDef buzzer_gpio;
+   5   1        buzzer_gpio.Mode = GPIO_OUT_PP;
+   6   1        buzzer_gpio.Pin = GPIO_Pin_4;
+   7   1        GPIO_Inilize(GPIO_P3,&buzzer_gpio);
+   8   1      
+   9   1      }
+  10          //激活pwm功能
+  11          void buzzer_pwm_init(){
+  12   1        PWMx_InitDefine buzzer_pwm;
+  13   1        buzzer_pwm.PWM_Mode = CCMRn_PWM_MODE1;      //模式,   CCMRn_FREEZE,CCMRn_MATCH_VALID,CCMRn_MATCH_INVALID,CCM
+             -Rn_ROLLOVER,CCMRn_FORCE_INVALID,CCMRn_FORCE_VALID,CCMRn_PWM_MODE1,CCMRn_PWM_MODE2
+  14   1        
+  15   1        buzzer_pwm.PWM_Period = MAIN_Fosc/1000;   //1ms //周期时间,   0~65535
+  16   1        buzzer_pwm.PWM_Duty = 0;  //赫兹    //占空比时间, 0~Period
+  17   1        buzzer_pwm.PWM_DeadTime = 0;  //死区发生器设置, 0~255
+  18   1        buzzer_pwm.PWM_EnoSelect = ENO8P;   //输出通道选择, ENO1P,ENO1N,ENO2P,ENO2N,ENO3P,ENO3N,ENO4P,ENO4N / ENO5
+             -P,ENO6P,ENO7P,ENO8P
+  19   1        buzzer_pwm.PWM_CEN_Enable = ENABLE;   //使能计数器, ENABLE,DISABLE
+  20   1        buzzer_pwm.PWM_MainOutEnable = ENABLE;//主输出使能,  ENABLE,DISABLE
+  21   1      
+  22   1        PWM_Configuration(PWM8, &buzzer_pwm);
+  23   1        PWM_Configuration(PWMB, &buzzer_pwm);
+  24   1        
+  25   1        //切换PWM8选择PWM8_SW_P34
+  26   1        PWM8_SW(PWM8_SW_P34);   
+  27   1      }
+  28          //num:百分之多少 0-100；
+  29          //updata_buzzer： 更新蜂鸣器的声音
+  30          void updata_buzzer(u8 num){
+  31   1      
+  32   1        PWMx_Duty buzzer_duty;
+  33   1        //x% =  x/100
+  34   1        buzzer_duty.PWM8_Duty = MAIN_Fosc/1000 * num /100;//占空比
+  35   1        UpdatePwm(PWM8, &buzzer_duty);
+  36   1      }
+  37          
+  38          void buzzer_start(){
+  39   1        updata_buzzer(50);
+  40   1      }
+  41          
+  42          void buzzer_stop(){
+  43   1        updata_buzzer(0);
+  44   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    134    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      27
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+C51 COMPILER V9.60.7.0   BUZZER                                                            12/30/2025 16:01:50 PAGE 2   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
